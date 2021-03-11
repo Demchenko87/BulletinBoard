@@ -161,8 +161,8 @@ def detail(request, rubric_pk, pk):
 def profile_bb_detail(request, pk):
     bb = get_object_or_404(Bb, pk=pk)
     ais = bb.additionalimage_set.all()
-    # comments = Comment.objects.filter(bb=pk, is_active=True)
-    context = {'bb': bb, 'ais': ais} #, 'comments': comments
+    comments = Comment.objects.filter(bb=pk, is_active=True)
+    context = {'bb': bb, 'ais': ais, 'comments': comments}
     return render(request, 'main/profile_bb_detail.html', context)
 
 @login_required
@@ -174,7 +174,7 @@ def profile_bb_add(request):
             formset = AIFormSet(request.POST, request.FILES, instance=bb)
             if formset.is_valid():
                 formset.save()
-                messages.add_message(request,messages.SUCCESS, 'Объявление добавлено')
+                messages.add_message(request, messages.SUCCESS, 'Объявление добавлено')
                 return redirect('main:profile')
     else:
         form = BbForm(initial={'author': request.user.pk})

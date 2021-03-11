@@ -7,8 +7,8 @@
     <h2>Добавление объявления</h2>
     <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
-    {% bootstrap_form form layout='horisontal' %}
-    {% bootstrap_formset formset layout='horisontal'%}
+    {% bootstrap_form form layout='horizontal' %}
+    {% bootstrap_formset formset layout='horizontal'%}
     {% buttons submit='Добавить' %}{% endbuttons %}
     </form>
 {% endblock %}

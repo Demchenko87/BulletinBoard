@@ -21,7 +21,10 @@
 </header>
 <div class="row">
     <ul class="col nav justify-content-end border text-white bg-success">
+     {% if user.is_authenticated %}
+     {% else %}
         <li class="nav-item"><a href="{% url 'main:register' %}" class="nav-link text-white">Регистрация</a></li>
+     {% endif %}
         {% if user.is_authenticated %}
          <li class="nav-item dropdown"><a href="#" class="nav-link dropdown-toggle text-white" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Профиль</a>
         <div class="dropdown-menu"><a href="{% url 'main:profile' %}" class="dropdown-item">Мои объявления</a><a href="{% url 'main:profile_change' %}" class="dropdown-item">Редактировать профиль</a><a href="{% url 'main:password_change' %}" class="dropdown-item">Изменить пароль</a>
@@ -42,6 +45,7 @@
 
 
     <nav class="col-md-auto nav flex-column border">
+
         <a href="{% url 'main:index'%}" class="nav-link root">Главная</a>
         <a href="{% url 'main:other' page='about' %}" class="nav-link root">О сайте</a>
         {% for rubric in rubrics %}

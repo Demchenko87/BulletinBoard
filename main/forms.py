@@ -66,7 +66,7 @@ class SubRubricForm(forms.ModelForm):
         fields = '__all__'
 
 class SearchForm(forms.Form):
-    keyword = forms.CharField(required=False, max_length=20, label='', widget=forms.TextInput(attrs={'placeholder': 'Посик по сату ...'}))
+    keyword = forms.CharField(required=False, max_length=20, label='', widget=forms.TextInput(attrs={'placeholder': 'Посик по разделам ...'}))
 
 
 class UserCommentForm(forms.ModelForm):
