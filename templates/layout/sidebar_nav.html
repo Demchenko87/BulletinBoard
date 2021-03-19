@@ -1,0 +1,158 @@
+{% load bootstrap4 %}
+{% load static %}
+<nav id="sidebar" class="sidebar-wrapper">
+    <div class="sidebar-content">
+      <div class="sidebar-brand">
+        <a href="{% url 'main:index' %}">Доска объявлений</a>
+{% for super_rubric in super_rubric_list %}
+   <h1>{{ super_rubric }}-{{ super_rubric_list }}</h1>
+{% endfor %}
+        <div id="close-sidebar">
+          <i class="fas fa-times"></i>
+        </div>
+      </div>
+
+
+    {% if user.is_authenticated %}
+         <div class="sidebar-menu">
+<ul> <li class="sidebar-dropdown">
+            <a href="javascript:void(0)">
+              <i class="fa fa-cogs"></i>
+              <span>Личный кабинет</span>
+
+            </a>
+            <div class="sidebar-submenu">
+              <ul style="margin-left: 0; padding: 0;">
+                <li>
+                  <a href="{% url 'main:profile' %}">Мои объявления <span class="badge badge-pill badge-warning">18</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="{% url 'main:profile_change' %}">Профиль</a>
+                </li>
+                 <li>
+                  <a href="{% url 'main:password_change' %}">Изменить пароль</a>
+                </li>
+                   <li>
+                      <a href="{% url 'main:logout' %}">Выйти</a>
+                  </li>
+                   <li><a href="{% url 'main:profile_delete' %}">Удалить</a></li>
+              </ul>
+
+
+            </div>
+          </li></ul>
+      </div>
+        {% else %}
+    {% endif %}
+
+
+    {% if user.is_authenticated %}
+{% else %}
+        <div class="sidebar-menu">
+        <ul>
+    <li><a href="{% url 'main:register' %}"> <i class="fa fa-edit"></i><span>Регистрация</span></a></li>
+    <li><a href="{% url 'main:login' %}"><i class="fa fa-sign-in-alt"></i><span>Вход</span></a></li>
+        </ul>
+        </div>
+{% endif %}
+
+
+
+
+{% if user.is_authenticated %}
+          <div class="sidebar-header">
+
+
+<div class="sidebar-menu" style="border:none;">
+<ul>
+            <div class="user-pic">
+                {% if not user.image %}
+          <img class="img-responsive img-rounded" src="/media/default.jpg" alt="avatar">
+                    {% else %}
+          <img class="img-responsive img-rounded" src="{{ user.image.url }}" alt="avatar">
+               {% endif %}
+
+        </div>
+        <div class="user-info">
+          <span class="user-name"><strong>{{ user.first_name }}</strong>
+            {{ user.last_name }}
+          </span>
+          <span class="user-role">{{ user.username }}</span>
+          <span class="user-status">
+            <i class="fa fa-circle"></i>
+            <span>Online</span>
+          </span>
+        </div>
+        </ul>
+</div>
+
+
+      </div>
+    {% else %}
+
+{% endif %}
+
+
+      <!-- sidebar-header  -->
+
+
+      <div class="sidebar-menu">
+        <ul>
+          <li class="header-menu">
+            <span>Рубрики</span>
+          </li>
+
+
+
+{% for super_rubric in super_rubrics %}
+    <li class="sidebar-dropdown">
+ <a href="javascript:void(0)"><i class="fa fa-file-alt"></i><span>{{ super_rubric }}</span></a>
+   <div class="sidebar-submenu">
+              <ul>
+                 {% for rubric in rubrics %}
+                     {% if  super_rubric.pk == rubric.super_rubric.pk %}
+                        <li>
+                          <a href="{% url 'main:by_rubric' pk=rubric.pk %}">{{ rubric.name }}</a>
+                        </li>
+                     {% endif %}
+                 {% endfor %}
+              </ul>
+        </div>
+    </li>
+
+{% endfor %}
+
+          <li class="header-menu">
+            <span>МЕНЮ</span>
+          </li>
+
+          <li>
+            <a href="{% url 'main:other' page='about' %}">
+              <i class="fa fa-info"></i>
+              <span>О нас</span>
+            </a>
+          </li>
+
+        </ul>
+      </div>
+    </div>
+    <!-- sidebar-content  -->
+    <div class="sidebar-footer">
+      <a href="#">
+        <i class="fa fa-bell"></i>
+        <span class="badge badge-pill badge-warning notification">3</span>
+      </a>
+      <a href="#">
+        <i class="fa fa-envelope"></i>
+        <span class="badge badge-pill badge-success notification">7</span>
+      </a>
+      <a href="#">
+        <i class="fa fa-cog"></i>
+        <span class="badge-sonar"></span>
+      </a>
+      <a href="#">
+        <i class="fa fa-power-off"></i>
+      </a>
+    </div>
+  </nav>

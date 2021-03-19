@@ -32,9 +32,9 @@ class NonactivatedFilter(admin.SimpleListFilter):
 
 class AdvUserAdmin(admin.ModelAdmin):
     list_display = ('__str__', 'is_activated', 'date_joined')
-    search_fields = ('username', 'email', 'first_name','last_name')
+    search_fields = ('username', 'email', 'first_name', 'last_name')
     list_filter = (NonactivatedFilter,)
-    fields = (('username', 'email'), ('first_name', 'last_name'), ('is_staff', 'is_superuser'), 'groups', 'user_permissions', ('last_login', 'date_joined'), 'is_activated')
+    fields = (('username', 'image', 'email'), ('first_name', 'last_name'), ('is_staff', 'is_superuser'), 'groups', 'user_permissions', ('last_login', 'date_joined'), 'is_activated')
     readonly_fields = ('last_login', 'date_joined')
     actions = (send_activation_notifications,)
 
@@ -59,7 +59,7 @@ class AdditionalImageInline(admin.TabularInline):
 
 class BbAdmin(admin.ModelAdmin):
     list_display = ('rubric', 'title', 'content', 'author', 'created_at')
-    fields = (('rubric', 'author'), 'title', 'content', 'price', 'contacts', 'image', 'is_active')
+    fields = (('rubric', 'author'), 'title', 'content', 'price', 'contacts', 'city', 'street', 'image', 'is_active')
     inlines = (AdditionalImageInline,)
 
 admin.site.register(Bb, BbAdmin)

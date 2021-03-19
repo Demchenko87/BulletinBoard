@@ -25,6 +25,7 @@ urlpatterns = [
     path('captcha/', include('captcha.urls')),
     path('api/', include('api.urls')),
     path('', include('main.urls')),
+
 ]
 if settings.DEBUG:
     urlpatterns.append(path('static/<path:path>', never_cache(serve)))

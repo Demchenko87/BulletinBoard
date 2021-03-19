@@ -1,6 +1,5 @@
 {% load bootstrap4 %}
 {% load static %}
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -9,60 +8,104 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{% block title %}Главная{% endblock %} - Доска объявлений</title>
+<link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+
 {% bootstrap_css %}
     <link rel="stylesheet" href="{% static 'main/style.css' %}">
 {% bootstrap_javascript jquery='slim'%}
+
 </head>
-<body class="container-fluid">
-<header class="mb-4 mt-4">
-<a href="{% url 'main:index' %}"><img src="https://cdn.shopify.com/s/files/1/2075/2405/files/Logo_bb375eb6-6ab5-4561-84a7-bd6f9e6f806b.jpg" alt="logo" width="200"></a>
+<body style="background: #f2f4f5;">
+<div class="page-wrapper chiller-theme toggled">
+  <a id="show-sidebar" class="btn btn-sm btn-dark" href="javascript:void(0)">
+    <i class="fas fa-bars"></i>
+  </a>
+ {% include 'layout/sidebar_nav.html' %}
+  <!-- sidebar-wrapper  -->
+  <main class="page-content">
+  <div class="container-fluid text-justify pt-0">
 
+           {% bootstrap_messages %}
 
-</header>
-<div class="row">
-    <ul class="col nav justify-content-end border text-white bg-success">
-     {% if user.is_authenticated %}
-     {% else %}
-        <li class="nav-item"><a href="{% url 'main:register' %}" class="nav-link text-white">Регистрация</a></li>
-     {% endif %}
-        {% if user.is_authenticated %}
-         <li class="nav-item dropdown"><a href="#" class="nav-link dropdown-toggle text-white" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Профиль</a>
-        <div class="dropdown-menu"><a href="{% url 'main:profile' %}" class="dropdown-item">Мои объявления</a><a href="{% url 'main:profile_change' %}" class="dropdown-item">Редактировать профиль</a><a href="{% url 'main:password_change' %}" class="dropdown-item">Изменить пароль</a>
-        <div class="dropdown-devider"></div>
-            <a href="{% url 'main:logout' %}" class="dropdown-item ">Выйти</a>
-        <div class="dropdown-devider"></div>
-            <a href="{% url 'main:profile_delete' %}" class="dropdown-item">Удалить</a></div></li>
-        {% else %}
-            <li class="nav-item"><a href="{% url 'main:login' %}" class="nav-link text-white">Вход</a></li>
-        {% endif %}
+    <div class="container">
+        <div class="row justify-content-md-center">
+            <div class="col-lg-8 mb-3">
+              <form action="{% url 'main:search' %}" method="GET">
+                <div class="input-group rounded mb-1">
+                  <input type="search" class="form-control rounded" name="q" placeholder="Поиск по сайту"  />
+                  <span class="input-group-text border-0 ml-2" id="search-addon">
+                    <button type="submit" class="btn btn-default p-0"><i class="fas fa-search"></i></button>
+                  </span>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
-        <li class="nav-item"><a href="{% url 'main:logout' %}" class="nav-link text-white">Выход</a></li>
-
-    </ul>
-</div>
-<div class="row">
-
-
-
-    <nav class="col-md-auto nav flex-column border">
-
-        <a href="{% url 'main:index'%}" class="nav-link root">Главная</a>
-        <a href="{% url 'main:other' page='about' %}" class="nav-link root">О сайте</a>
-        {% for rubric in rubrics %}
-            {% ifchanged rubric.super_rubric.pk %}
-            <span class="nav-link root font-weight-bold">{{ rubric.super_rubric.name }}</span>
-            {% endifchanged %}
-            <a href="{% url 'main:by_rubric' pk=rubric.pk %}" class="nav-link">{{ rubric.name }}</a>
-        {% endfor  %}
-    </nav>
-    <section class="col border py-2">
-        {% bootstrap_messages %}
         {% block content %}
         {% endblock %}
-    </section>
+
+  </div>
+
+<footer class="text-center mt-5">
+        <div class="mb-2">
+          <small>
+            Copyright © 2021  created by <a target="_blank" rel="noopener noreferrer" href="https://whitecup.net">
+              WhiteCup.net
+            </a>
+          </small>
+        </div>
+
+      </footer>
+
+
+  </main>
+  <!-- page-content" -->
 </div>
-<footer class="mt-3">
-    <p class="text-left">&copy; create by <a href="https://whitecup.net" class="text-success">WhiteCup.net</a>.</p>
-</footer>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+    <script>
+      jQuery(function ($) {
+
+    $(".sidebar-dropdown > a").click(function() {
+  $(".sidebar-submenu").slideUp(200);
+  if (
+    $(this)
+      .parent()
+      .hasClass("active")
+  ) {
+    $(".sidebar-dropdown").removeClass("active");
+    $(this)
+      .parent()
+      .removeClass("active");
+  } else {
+    $(".sidebar-dropdown").removeClass("active");
+    $(this)
+      .next(".sidebar-submenu")
+      .slideDown(200);
+    $(this)
+      .parent()
+      .addClass("active");
+  }
+});
+
+$("#close-sidebar").click(function() {
+  $(".page-wrapper").removeClass("toggled");
+});
+$("#show-sidebar").click(function() {
+  $(".page-wrapper").addClass("toggled");
+});
+
+
+
+
+});
+    </script>
 </body>
 </html>

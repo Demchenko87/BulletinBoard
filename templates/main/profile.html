@@ -1,4 +1,4 @@
-{% extends "layout/basic.html" %}
+{% extends 'layout/basic_no_search.html'%}
 
 {% load thumbnail %}
 {% load static %}
@@ -12,7 +12,8 @@
 {% else %}
 <p>Здравствуйте!</p>
 {% endif %}
-<p><a href="{% url 'main:profile_bb_add' %}">Добавить объявление</a></p>
+<p><a href="{% url 'main:profile_bb_add' %}" class="btn btn-success"><i class="fa fa-plus" aria-hidden="true"></i>
+ Добавить объявление</a></p>
 {% if bbs %}
 <h3>Ваши объявления</h3>
 <ul class="list-unstyled">

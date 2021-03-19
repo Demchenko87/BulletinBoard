@@ -27,7 +27,7 @@ SECRET_KEY = '--0&b+nuptck_nr$w_g&($%z8g(l55)3v93)2_tw1i7km33#dk'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = []
 
 EMAIL_PORT = 1025
 
@@ -54,12 +54,14 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+
 ]
 
 ROOT_URLCONF = 'BulletinBoard.urls'
@@ -67,8 +69,7 @@ ROOT_URLCONF = 'BulletinBoard.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -146,15 +147,23 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 THUMBNAIL_ALIASES = {
     '': {
         'default': {
-            'size': (96, 96),
-            'crop': 'scale',
+            'size': (288, 288),
+            'crop': True
+            # 'crop': 'scale',
         }
     }
 }
 THUMBNAIL_BASEDIR = 'thumbnails'
 
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_URLS_REGEX = r"^/api/.*%"
+CORS_URLS_REGEX = r'^/api/.*$'
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:4200",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000"
+]
 
-SITE_ID = 1
+
+
+#SITE_ID = 1
 

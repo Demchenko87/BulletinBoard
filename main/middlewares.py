@@ -1,8 +1,9 @@
-from .models import SubRubric
+from .models import SubRubric, SuperRubric
 
 def bbord_context_processor(request):
     context = {}
     context['rubrics'] = SubRubric.objects.all()
+    context['super_rubrics'] = SuperRubric.objects.all()
     context['keyword'] = ''
     context['all'] = ''
     if 'keyword' in request.GET:

@@ -1,0 +1,96 @@
+{% load bootstrap4 %}
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}Главная{% endblock %} - Доска объявлений</title>
+<link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+
+{% bootstrap_css %}
+    <link rel="stylesheet" href="{% static 'main/style.css' %}">
+{% bootstrap_javascript jquery='slim'%}
+
+</head>
+<body style="background: #f2f4f5;">
+<div class="page-wrapper chiller-theme toggled">
+  <a id="show-sidebar" class="btn btn-sm btn-dark" href="javascript:void(0)">
+    <i class="fas fa-bars"></i>
+  </a>
+  {% include 'layout/sidebar_nav.html' %}
+  <!-- sidebar-wrapper  -->
+  <main class="page-content">
+  <div class="container-fluid text-justify pt-0">
+
+           {% bootstrap_messages %}
+
+        {% block content %}
+        {% endblock %}
+
+  </div>
+
+<footer class="text-center mt-5">
+        <div class="mb-2">
+          <small>
+            Copyright © 2021  created by <a target="_blank" rel="noopener noreferrer" href="https://whitecup.net">
+              WhiteCup.net
+            </a>
+          </small>
+        </div>
+
+      </footer>
+
+
+  </main>
+  <!-- page-content" -->
+</div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+    <script>
+      jQuery(function ($) {
+
+    $(".sidebar-dropdown > a").click(function() {
+  $(".sidebar-submenu").slideUp(200);
+  if (
+    $(this)
+      .parent()
+      .hasClass("active")
+  ) {
+    $(".sidebar-dropdown").removeClass("active");
+    $(this)
+      .parent()
+      .removeClass("active");
+  } else {
+    $(".sidebar-dropdown").removeClass("active");
+    $(this)
+      .next(".sidebar-submenu")
+      .slideDown(200);
+    $(this)
+      .parent()
+      .addClass("active");
+  }
+});
+
+$("#close-sidebar").click(function() {
+  $(".page-wrapper").removeClass("toggled");
+});
+$("#show-sidebar").click(function() {
+  $(".page-wrapper").addClass("toggled");
+});
+
+
+
+
+});
+    </script>
+</body>
+</html>

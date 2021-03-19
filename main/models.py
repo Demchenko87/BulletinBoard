@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from .utilities import get_timestramp_path
 
 class AdvUser(AbstractUser):
+    image = models.ImageField(default='default.jpg', upload_to='profile_pics', verbose_name='Аватар', null=True, blank=True,)
     is_activated = models.BooleanField(default=True, db_index=True, verbose_name='Прошел Активацию?')
     send_messages = models.BooleanField(default=True, verbose_name='Снять оповещение о новых комментариях?')
 
@@ -56,7 +57,9 @@ class Bb(models.Model):
     title = models.CharField(max_length=40, verbose_name='Товар')
     content = models.TextField(verbose_name='Описание')
     price = models.FloatField(default=0, verbose_name='Цена')
-    contacts = models.TextField(verbose_name='Контакты')
+    contacts = models.CharField(verbose_name='Телефон', max_length=40)
+    city = models.CharField(verbose_name='Город', max_length=40, blank=True, null=True)
+    street = models.CharField(verbose_name='Улица или проспект', max_length=150, blank=True, null=True)
     image = models.ImageField(blank=True, upload_to=get_timestramp_path, verbose_name='Изображения')
     author = models.ForeignKey(AdvUser, on_delete=models.CASCADE, verbose_name='Автор объявлений')
     is_active = models.BooleanField(default=True, db_index=True, verbose_name='Выводить в списке?')

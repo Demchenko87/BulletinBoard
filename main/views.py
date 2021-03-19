@@ -11,6 +11,7 @@ from django.template.loader import get_template
 from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
@@ -50,7 +51,7 @@ def profile(request):
     return render(request, 'main/profile.html', context)
 
 def index(request):
-    bbs = Bb.objects.filter(is_active=True)[:10]
+    bbs = Bb.objects.filter(is_active=True)[:100]
     context = {'bbs': bbs}
     return render(request, 'main/index.html', context)
 
@@ -115,6 +116,7 @@ class DeleteUserView(LoginRequiredMixin, DeleteView):
 def by_rubric(request, pk):
     rubric = get_object_or_404(SubRubric, pk=pk)
     bbs = Bb.objects.filter(is_active=True, rubric=pk)
+    # bbs_all = Bb.objects.filter(is_active=True)
     if 'keyword' in request.GET:
         keyword = request.GET['keyword']
         q = Q(title__icontains=keyword) | Q(content__icontains=keyword)
@@ -183,16 +185,17 @@ def profile_bb_add(request):
     return render(request, 'main/profile_bb_add.html', context)
 
 @login_required
-def profile_bb_change(request,pk):
+def profile_bb_change(request, pk):
     bb = get_object_or_404(Bb, pk=pk)
-    if request.method == 'POTS':
-        form = BbForm(request.post, request.files, instance=bb)
+    if request.method == 'POST':
+        form = BbForm(request.POST, request.FILES, instance=bb)
         if form.is_valid():
             bb = form.save()
             formset = AIFormSet(request.POST, request.FILES, instance=bb)
             if formset.is_valid():
                 formset.save()
-                messages.add_message(request,messages.SUCCESS, 'Объявление исправлено')
+                messages.add_message(request, messages.SUCCESS,
+                                     'Объявление исправлено')
                 return redirect('main:profile')
     else:
         form = BbForm(instance=bb)
@@ -201,14 +204,14 @@ def profile_bb_change(request,pk):
     return render(request, 'main/profile_bb_change.html', context)
 
 @login_required
-def profile_bb_delete(request,pk):
+def profile_bb_delete(request, pk):
     bb = get_object_or_404(Bb, pk=pk)
-    if request.method == 'POTS':
+    if request.method == 'POST':
         bb.delete()
         messages.add_message(request, messages.SUCCESS, 'Объявление удалено')
         return redirect('main:profile')
     else:
-        context = {'bb':bb}
+        context = {'bb': bb}
         return render(request, 'main/profile_bb_delete.html', context)
 
 def post_save_dispatcher(sender, **kwargs):
@@ -216,3 +219,23 @@ def post_save_dispatcher(sender, **kwargs):
     if kwargs['created'] & author.send_messages:
         send_new_comment_notification(kwargs['instance'])
 post_save.connect(post_save_dispatcher, sender=Comment)
+
+
+# class Search(ListView):
+    # paginate_by = 3
+    # def get_queryset(request):
+    #
+    #     return Bb.objects.filter(title__icontains=self.request.GET.get("q"))
+    #
+    # def get_context_data(self, *args, **kwargs):
+    #     context = super().get_context_data(*args, **kwargs)
+    #     context["q"] = f'q={self.request.GET.get("q")}&'
+    #     return context
+
+
+def filter(request):
+    search = request.GET['q']
+    bb = Bb.objects.filter(Q(title__icontains=search) | Q(content__icontains=search))
+    return render(request, 'main/search.html', context={
+                'bbs': bb,
+                })

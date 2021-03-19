@@ -1,0 +1,41 @@
+{% extends "layout/basic.html" %}
+{% load thumbnail %}
+{% load bootstrap4 %}
+{% load static %}
+{% block content %}
+
+ <div class="col-lg-12 mt-5 p-0">
+<div class="card-deck">
+
+
+     {% for bb in bbs %}
+                 {% url 'main:detail' rubric_pk=bb.rubric.pk pk=bb.pk as url %}
+    <div class="card col-lg-3">
+    <a href="{{ url }}{{ all }}" class="mt-3">
+        {% if bb.image %}
+         <img class="card-img-top" src="{% thumbnail bb.image 'default' %}">
+        {% else %}
+        <img class="card-img-top" src="{% static 'main/empty.jpg' %}">
+        {% endif %}
+ </a>
+
+  <div class="card-body p-0 mt-3 mb-3">
+    <h5 class="card-title">{{ bb.title }}</h5>
+
+       <h6>Цена: {{ bb.price }} грн.</h6>
+        <p class="card-text right"><small class="text-muted">Добавлено {{ bb.created_at }}</small></p>
+    <a href="{{ url }}{{ all }}" class="btn btn-success left">Подробнее</a>
+  </div>
+</div>
+     {% endfor %}
+
+
+</div>
+ </div>
+
+
+
+
+
+
+{% endblock %}

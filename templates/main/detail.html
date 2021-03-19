@@ -6,6 +6,7 @@
 {% block content %}
     <div class="container-fluid mt-3">
         <div class="row">
+             <p><a href="{% url 'main:by_rubric' pk=bb.rubric.pk%}{{ all }}" class="btn btn-success"><< Назад</a></p>
             {% if bb.image %}
                 <div class="col-md-auto">
                     <img src="{{ bb.image.url }}" alt="" class="main-image">
@@ -20,6 +21,7 @@
             </div>
         </div>
     </div>
+
     {% if ais %}
         <div class="d-flex justify-content-between flex-wrap mt-5">
         {% for ai in ais %}
@@ -29,7 +31,7 @@
         {% endfor %}
         </div>
     {% endif %}
-    <p><a href="{% url 'main:by_rubric' pk=bb.rubric.pk%}{{ all }}">Назад</a></p>
+
 
 <h4 class="mt-5">Новый комментарий</h4>
 <form method="post">

@@ -1,0 +1,28 @@
+{% load thumbnail %}
+{% load bootstrap4 %}
+{% load static %}
+<div class="col-lg-12 mt-0 p-0">
+<div class="card-deck">
+{% if bbs %}
+     {% for bb in bbs %}
+         {% url 'main:detail' rubric_pk=bb.rubric.pk pk=bb.pk as url %}
+    <div class="card col-lg-3">
+    <a href="{{ url }}{{ all }}" class="mt-3">
+        {% if bb.image %}
+         <img class="card-img-top" src="{% thumbnail bb.image 'default' %}" alt="{{ bb.title }}">
+        {% else %}
+        <img class="card-img-top" src="{% static 'main/empty.jpg' %}" alt="{{ bb.title }}">
+        {% endif %}
+ </a>
+  <div class="card-body p-0 mt-3 mb-3">
+    <h5 class="card-title">{{ bb.title }}</h5>
+       <h6>Цена: {{ bb.price }} грн.</h6>
+
+        <p class="card-text right"><small class="text-muted">{{ bb.city }}, {{ bb.street }} <br>{{ bb.created_at }}</small></p>
+{#    <a href="{{ url }}{{ all }}" class="btn btn-success left">Подробнее</a>#}
+  </div>
+</div>
+    {% endfor %}
+{% endif %}
+</div>
+    </div>

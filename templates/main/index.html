@@ -1,4 +1,11 @@
 {% extends "layout/basic.html" %}
+{% load thumbnail %}
+{% load bootstrap4 %}
+{% load static %}
 {% block content %}
-    <h2>Последние 10 объявлений</h2>
+       <div class="col-lg-12 mt-0 p-0">
+        <div class="alert alert-success text-center" role="alert">Всего объявлений на сайте {{ bbs.count }} шт. </div>
+     </div>
+{% include 'main/list_product.html' %}
 {% endblock %}
+
