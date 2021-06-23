@@ -14,32 +14,37 @@
 {% endif %}
 <p><a href="{% url 'main:profile_bb_add' %}" class="btn btn-success"><i class="fa fa-plus" aria-hidden="true"></i>
  Добавить объявление</a></p>
-{% if bbs %}
+<div class="col-lg-12 mt-0 p-0">
 <h3>Ваши объявления</h3>
-<ul class="list-unstyled">
-    {% for bb in bbs %}
-    <li class="media my-5 p-3 border">
-        {% url 'main:profile_bb_detail' pk=bb.pk as url %}
-        <a href="{{ url }}{{ all }}">
+    <div class="card-deck row">
+{% if bbs %}
+
+     {% for bb in bbs %}
+         {% url 'main:detail' rubric_pk=bb.rubric.pk pk=bb.pk as url %}
+    <div class="card col-lg-3">
+    <a href="{{ url }}{{ all }}" class="mt-3">
         {% if bb.image %}
-        <img class="mr-3" src="{% thumbnail bb.image 'default' %}">
+         <img class="card-img-top" src="{% thumbnail bb.image 'default' %}" alt="{{ bb.title }}">
         {% else %}
-        <img class="mr-3" src="{% static 'main/empty.jpg' %}">
+        <img class="card-img-top" src="{% static 'main/empty.jpg' %}" alt="{{ bb.title }}">
         {% endif %}
-        </a>
-        <div class="media-body">
-          <h3><a href="{{ url }}{{ all }}">
-          {{ bb.title }}</a></h3>
-          <div>{{ bb.content }}</div>
-          <p class="text-right font-weight-bold">Цена: {{ bb.price }} грн.</p>
-          <p class="text-right font-italic">{{ bb.created_at }}</p>
-          <p class="text-right mt-2">
-            <a href="{% url 'main:profile_bb_change' pk=bb.pk %}">Исправить</a>
-            <a href="{% url 'main:profile_bb_delete' pk=bb.pk %}">Удалить</a>
+ </a>
+  <div class="card-body p-0 mt-3 mb-3">
+    <h5 class="text-left">{{ bb.title }}</h5>
+       <h6>Цена: {{ bb.price }} грн.</h6>
+
+        <p class="card-text right"><small class="text-muted">{{ bb.city }}, {{ bb.street }} <br>{{ bb.created_at }}</small></p>
+      <p class="text-right m-0">
+<a href="{% url 'main:profile_bb_change' pk=bb.pk %}" class="btn btn-info mb-2" style="font-size: 15px; padding:5px;float: left; width: 100%;"><i class="fas fa-edit"></i> Редактировать</a>
+    <a href="{% url 'main:profile_bb_delete' pk=bb.pk %}" class="btn btn-danger" style="width: 100%; padding: 5px;"><i class="fas fa-trash-alt"></i> Удалить</a>
+
           </p>
-        </div>
-    </li>
+
+  </div>
+</div>
     {% endfor %}
-</ul>
 {% endif %}
+</div>
+</div>
+
 {% endblock %}

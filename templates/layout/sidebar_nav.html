@@ -13,18 +13,20 @@
       </div>
 
 
-    {% if user.is_authenticated %}
+{% if user.is_authenticated %}
          <div class="sidebar-menu">
 <ul> <li class="sidebar-dropdown">
             <a href="javascript:void(0)">
               <i class="fa fa-cogs"></i>
               <span>Личный кабинет</span>
-
             </a>
             <div class="sidebar-submenu">
               <ul style="margin-left: 0; padding: 0;">
                 <li>
-                  <a href="{% url 'main:profile' %}">Мои объявления <span class="badge badge-pill badge-warning">18</span>
+            <a href="{% url 'main:profile' %}">Мои объявления <span class="badge badge-pill badge-warning">
+
+            {{ bbs_count.count }}
+                  </span>
                   </a>
                 </li>
                 <li>

@@ -1,0 +1,14 @@
+      <form method="post" action="{% url 'main:index' %}" name="rating">
+                        {% csrf_token %}
+                      <div>
+                        <input type="hidden" value="{{ user.username }}" name="user">
+                        <input type="hidden" value="{{ bb.author.username }}" name="author">
+
+                        {% for star in stars %}
+                            <input type="radio" id="star{{ star }}" name="star" value="{{ star }}">
+                            <label for="star{{ star }}">{{ star }}</label>
+                        {% endfor %}
+
+                      </div>
+ <button type="submit" class="btn btn-warning">Рейтинг</button>
+                    </form>

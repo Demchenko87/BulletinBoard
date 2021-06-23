@@ -27,9 +27,11 @@ SECRET_KEY = '--0&b+nuptck_nr$w_g&($%z8g(l55)3v93)2_tw1i7km33#dk'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'developer.mozilla.org', 'plugins.jetbrains.com']
 
 EMAIL_PORT = 1025
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+ACCOUNT_EMAIL_VERIFICATION = "none"
 
 # Application definition
 
@@ -51,6 +53,7 @@ INSTALLED_APPS = [
 
 ]
 
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -60,6 +63,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 
 
 ]
@@ -144,6 +148,7 @@ STATICFILES_DIRS = [STATIC_DIR]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+
 THUMBNAIL_ALIASES = {
     '': {
         'default': {
@@ -165,5 +170,5 @@ CORS_ALLOWED_ORIGINS = [
 
 
 
-#SITE_ID = 1
+SITE_ID = 1
 

@@ -1,0 +1,39 @@
+{% extends 'layout/basic_no_search.html'%}
+{% load thumbnail %}
+{% load static %}
+{% block title %}Профиль пользователя{% endblock %}
+{% block content %}
+<div class="col-lg-12 mt-0 p-0">
+<div class="alert alert-dark" role="alert">
+    Список объявлений пользователя
+</div>
+
+<div class="card-deck row">
+
+{% for bb_profile_seller in bb_profile_seller %}
+    {% url 'main:detail' rubric_pk=bb_profile_seller.rubric.pk pk=bb_profile_seller.pk as url %}
+    <div class="card col-lg-3">
+    <a href="{{ url }}{{ all }}" class="mt-3">
+        {% if bb_profile_seller.image %}
+         <img class="card-img-top" src="{% thumbnail bb_profile_seller.image 'default' %}" alt="{{ bb_profile_seller.title }}">
+        {% else %}
+        <img class="card-img-top" src="{% static 'main/empty.jpg' %}" alt="{{ bb_profile_seller.title }}">
+        {% endif %}
+ </a>
+  <div class="card-body p-0 mt-3 mb-3">
+    <h5 class="card-title">{{ bb_profile_seller.title }}</h5>
+       <h6>Цена: {{ bb_profile_seller.price }} грн.</h6>
+
+        <p class="card-text right"><small class="text-muted">{{ bb_profile_seller.city }}, {{ bb_profile_seller.street }} <br>{{ bb_profile_seller.created_at }}</small></p>
+
+  </div>
+</div>
+
+{% endfor %}
+
+
+
+
+</div>
+</div>
+{% endblock %}

@@ -1,54 +1,242 @@
 {% extends 'layout/basic.html' %}
+{% load static %}
+{% load thumbnail %}
 {% load bootstrap4 %}
 {% block title %}
     {{ bb.title }} - {{ bb.rubric.name }}
 {% endblock %}
 {% block content %}
-    <div class="container-fluid mt-3">
+    <div class="container mt-3">
+    <p class="mt-3 mb-3"><a href="{% url 'main:by_rubric' pk=bb.rubric.pk%}{{ all }}" class="btn btn-success"><i class="fas fa-arrow-left"></i> Назад</a></p>
         <div class="row">
-             <p><a href="{% url 'main:by_rubric' pk=bb.rubric.pk%}{{ all }}" class="btn btn-success"><< Назад</a></p>
+        <div class="col-lg-6">
             {% if bb.image %}
-                <div class="col-md-auto">
-                    <img src="{{ bb.image.url }}" alt="" class="main-image">
-                </div>
+                    <a href="{{ bb.image.url }}" data-fancybox="gallery"><img src="{{ bb.image.url }}" alt="{{ bb.title }}" width="100%"></a>
             {% endif %}
-            <div class="col">
+
+                <div class="col-lg-12 m-0 p-0">
+        <div class="row mt-3">
+{% if ais %}
+        {% for ai in ais %}
+            <div class="col-lg-4">
+            {% if ai.image %}
+                <a href="{{ ai.image.url }}" data-fancybox="gallery"><img src="{% thumbnail ai.image 'default' %}" alt="{{ bb.title }}" width="100%"></a>
+        {% else %}
+                {% endif %}
+
+            </div>
+
+        {% endfor %}
+    {% endif %}
+        </div>
+        </div>
+        </div>
+            <div class="col-lg-6">
+            <div class="row">
+                <div class="col-lg-6">
+                    <h6 class="mb-3 ">Продавец</h6>
+
+<p class="text-info m-0 p-0"><b>{{ bb.author.last_name }} {{ bb.author.first_name }}</b></p>
+
+                    <br>
+                    <div class="bg-info p-2 text-center" style="border-radius: 5px;">
+                    <a href="{% url 'main:profile_seller' pk=bb.author.pk %}" class="text-white" style="text-decoration: none;">Все объявления
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <h6>Рейтинг продавца:  <strong> {% if star_form == None %} 0 {% else %}{{ star_form }}{% endif %}</strong></h6>
+
+                </div>
+            </div>
+
+
+                <hr>
+
                 <h2>{{ bb.title }}</h2>
                 <p>{{ bb.content }}</p>
-                <p class="font-wight-bold">{{ bb.price }} грн.</p>
-                <p>{{ bb.contacts }}</p>
-                <p class="text-right font-italic">Добавлено {{ bb.created_at }}</p>
+                <h3 class="font-wight-bold">Цена: {{ bb.price }} грн.</h3>
+                <p class="font-italic">Добавлено {{ bb.created_at }}</p>
+
+                <button class="push_phone btn btn-info" type="button">Показать номер</button>
+
+<div class="contphone hidden">
+    <h6 id = "translationTel" class="alert alert-primary">{{ bb.contacts }}</h6>
+</div>
+  {% if bb.delivery1 == True or bb.delivery2 == True or bb.delivery3 == True %}
+<div class="mt-5">
+<h6 class="mb-3">Способы оплаты:</h6>
+                {% if bb.delivery1 == True %}
+                    <p><img src="/media/delivery/nov.png" alt="nova posta" width="28"> Новая почта {% if not bb.comment1%}{% else %}{{ bb.comment1 }}{% endif %}</p>
+                {% endif %}
+                {% if bb.delivery2 == True %}
+                    <p><img src="/media/delivery/ukr.png" alt="nova posta" width="28"> Укр почта  {% if not bb.comment2%}{% else %}{{ bb.comment2 }}{% endif %}</p>
+                {% endif %}
+                {% if bb.delivery3 == True %}
+                    <p><img src="/media/delivery/just.jpg" alt="nova posta" width="28"> Доставка Justin {% if not bb.comment3%}{% else %}{{ bb.comment3 }}{% endif %}</p>
+                {% endif %}
+</div>
+                <hr>
+{% endif %}
+ {% if bb.money == True or bb.сashless == True or bb.invoce == True or bb.visa == True or bb.mastercard == True %}
+<div class=" mt-1">
+<h6 class="mb-3">Способы доставки:</h6>
+<div class="row">
+<div class="col-lg-6">
+  {% if bb.money == True %}
+     <p><img src="/media/delivery/money.png" alt="Наличный" width="28"> Наличный </p>
+  {% endif %}
+  {% if bb.сashless == True %}
+      <p><img src="/media/delivery/terminal.png" alt="Безналичный" width="28"> Безналичный </p>
+  {% endif %}
+  {% if bb.invoce == True %}
+     <p><img src="/media/delivery/ico_doc.png" alt="Оплата по счету" width="28"> Оплата по счету </p>
+  {% endif %}
+</div>
+<div class="col-lg-6">
+  {% if bb.visa == True %}
+      <p><img src="/media/delivery/visa.png" alt="VISA" width="28"> VISA </p>
+  {% endif %}
+  {% if bb.mastercard == True %}
+      <p><img src="/media/delivery/master.png" alt="VISA" width="28"> Mastercard </p>
+  {% endif %}
+</div>
+</div>
+</div>
+{% endif %}
+
+
             </div>
-        </div>
+
+
+                </div>
+
     </div>
 
-    {% if ais %}
-        <div class="d-flex justify-content-between flex-wrap mt-5">
-        {% for ai in ais %}
-            <div>
-                <img src="{{ ai.image.url }}" class="additional-image" alt="image">
-            </div>
-        {% endfor %}
-        </div>
-    {% endif %}
+
 
 
 <h4 class="mt-5">Новый комментарий</h4>
 <form method="post">
     {% csrf_token %}
-    {% bootstrap_form form layout='horizontal' %}
-    {% buttons submit='Добавить' %}{% endbuttons %}
+<input type="hidden" name="bb" value="{{ bb.id}}" id="id_bb">
+<input type="hidden" name="author" value="{{ user.username }}" id="id_author">
+<input type="hidden" name="user" value="{{ bb.author.username }}" id="id_user">
+
+<div class="form-group row">
+  <label class="col-md-3 col-form-label" for="id_content">Рейтинг продавца</label>
+    <div class="col-md-9">
+
+<span class="rating">
+
+     {% for star in stars %}
+
+         <input class="form-check-input" type="radio" id="exampleRadios{{ star }}" name="star" value="{{ star }}" checked>
+         <label class="form-check-label" for="exampleRadios{{ star }}">{{ star }}</label>
+
+     {% endfor %}
+
+
+</span>
+
+    </div>
+</div>
+
+
+<div class="form-group row">
+    <label class="col-md-3 col-form-label" for="id_content">Содержание</label>
+    <div class="col-md-9">
+        <textarea name="content" cols="40" rows="10" class="form-control" placeholder="Содержание" title="" required="" id="id_content"></textarea>
+    </div>
+</div>
+
+
+    <div class="form-group"><button class="btn btn-warning text-white" type="submit">Добавить</button></div>
 </form>
+
+
+
+
+
+
+
 {% if comments %}
-<div class="mt-5">
-    {% for comment in comments %}
-    <div class="my-2 p-2 border">
-        <h5>{{ comment.author }}</h5>
-        <p>{{ comment.content }}</p>
-        <p class="text-right font-italic">{{ comment.created_at }}</p>
+    <div class="row">
+     {% for comment in comments %}
+    <div class="col-md-12">
+
+          <div class="card flex-md-row mb-4 box-shadow h-md-250">
+            <div class="card-body d-flex flex-column align-items-start">
+                <div class="row container p-0 m-0">
+                <div class="col-lg-6 p-0">
+              <strong class="d-inline-block mb-2 text-primary">{{ comment.author }}</strong></div>
+<div class="col-lg-6 p-0 text-right stars_view">
+{% if comment.star == '1' %}
+    <img src="/static/images/star-on-big.png" alt="star" >
+{% endif %}
+{% if comment.star == '2' %}
+    <img src="/static/images/star-on-big.png" alt="star" >
+    <img src="/static/images/star-on-big.png" alt="star" >
+{% endif %}
+{% if comment.star == '3' %}
+    <img src="/static/images/star-on-big.png" alt="star" >
+    <img src="/static/images/star-on-big.png" alt="star" >
+    <img src="/static/images/star-on-big.png" alt="star" >
+{% endif %}
+{% if comment.star == '4' %}
+    <img src="/static/images/star-on-big.png" alt="star" >
+    <img src="/static/images/star-on-big.png" alt="star" >
+    <img src="/static/images/star-on-big.png" alt="star" >
+    <img src="/static/images/star-on-big.png" alt="star" >
+{% endif %}
+{% if comment.star == '5' %}
+    <img src="/static/images/star-on-big.png" alt="star" >
+    <img src="/static/images/star-on-big.png" alt="star" >
+    <img src="/static/images/star-on-big.png" alt="star" >
+    <img src="/static/images/star-on-big.png" alt="star" >
+    <img src="/static/images/star-on-big.png" alt="star" >
+{% endif %}
+ </div>
+                
+
+                    {% if comment.author == user.username %}
+
+               <div class="col-lg-12 p-0 text-right"><strong class="d-inline-block mb-2 text-primary "><a href="{% url 'main:comment_bb_change' pk=comment.pk %}" title="Редактировать"><i class="fas fa-edit"></i></a> <a href="{% url 'main:comment_bb_delete' pk=comment.pk %}" title="Удалить"><i class="fas fa-trash-alt"></i></a></strong></div>
+</form>
+                    {% endif %}
+                </div>
+
+                <p class="card-text mb-auto">{{ comment.content }}</p>
+                 <div class="mb-1 text-muted" style="font-size:10px;">{{ comment.created_at }}</div>
+            </div>
+            </div>
     </div>
     {% endfor %}
-</div>
-{% endif %}
+    </div>
+    {% endif %}
+
+
+
+    <script>
+
+const btn = document.querySelector(".push_phone");
+const content = document.querySelector(".contphone");
+
+btn.addEventListener("click", btnClick);
+
+function btnClick() {
+  console.log(content.classList);
+
+  if (content.classList.contains("hidden")) {
+    btn.textContent = "Скрыть элемент";
+  } else {
+    btn.textContent = "Показать элемент";
+  }
+
+  content.classList.toggle("hidden");
+}
+
+</script>
 
 {% endblock %}

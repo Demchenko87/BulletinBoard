@@ -1,0 +1,205 @@
+{% load bootstrap4 %}
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}Главная{% endblock %} - Доска объявлений</title>
+
+<link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+ <link href="{% static '/images/star-on-big.png' %}" rel="shortcut icon" type="image/x-icon" />
+{% bootstrap_css %}
+    <link rel="stylesheet" href="{% static 'main/style.css' %}">
+{% bootstrap_javascript jquery='slim'%}
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+<script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+</head>
+<body style="background: #f2f4f5;">
+<div class="page-wrapper chiller-theme toggled">
+  <a id="show-sidebar" class="btn btn-sm btn-dark" href="javascript:void(0)">
+    <i class="fas fa-bars"></i>
+  </a>
+ {% include 'layout/sidebar_nav.html' %}
+  <!-- sidebar-wrapper  -->
+  <main class="page-content">
+  <div class="container-fluid text-justify pt-0">
+
+           {% bootstrap_messages %}
+
+    <div class="container">
+        <div class="row justify-content-md-center">
+            <div class="col-lg-8 mb-3">
+                <div class="row">
+                <div class="col-lg-1 left">
+
+
+<h1>  {{ search_list }}</h1>
+
+
+                    </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+  </div>
+
+<footer class="text-center mt-5">
+        <div class="mb-2">
+          <small>
+            Copyright © 2021  created by <a target="_blank" rel="noopener noreferrer" href="https://whitecup.net">
+              WhiteCup.net
+            </a>
+          </small>
+        </div>
+
+      </footer>
+
+
+  </main>
+  <!-- page-content" -->
+</div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+{#<script>#}
+{#function showSTR(trueTel) {#}
+{#document.getElementById('translationTel').firstChild.replaceData (0 , trueTel.length, trueTel);#}
+{#}#}
+{#</script>#}
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+    <script>
+      jQuery(function ($) {
+
+    $(".sidebar-dropdown > a").click(function() {
+  $(".sidebar-submenu").slideUp(200);
+  if (
+    $(this)
+      .parent()
+      .hasClass("active")
+  ) {
+    $(".sidebar-dropdown").removeClass("active");
+    $(this)
+      .parent()
+      .removeClass("active");
+  } else {
+    $(".sidebar-dropdown").removeClass("active");
+    $(this)
+      .next(".sidebar-submenu")
+      .slideDown(200);
+    $(this)
+      .parent()
+      .addClass("active");
+  }
+});
+
+$("#close-sidebar").click(function() {
+  $(".page-wrapper").removeClass("toggled");
+});
+$("#show-sidebar").click(function() {
+  $(".page-wrapper").addClass("toggled");
+});
+
+
+
+
+});
+    </script>
+
+
+
+
+<script>
+var mediaRecorder;
+var recording = false;
+var recorder = navigator.mediaDevices.getUserMedia({audio:true});
+var interval;
+
+function Start(){
+        recorder.then(stream => {
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.mimeType = 'audio/ogg';
+        recording = true;
+        mediaRecorder.start();
+        const audioChunks = [];
+        mediaRecorder.ondataavailable = (event) => {
+            audioChunks.push(event.data);
+        };
+        mediaRecorder.onstop = () => {
+            const audioBlob = new Blob(audioChunks, {type:'audio/ogg;codecs=0'});
+            const audioUrl = URL.createObjectURL(audioBlob);
+            var url = (window.URL || window.webkitURL).createObjectURL(audioBlob);
+            var link = document.getElementById("save");
+		    link.href = url;
+		    link.download = "record_voice.ogg";
+		    var audio = document.createElement('audio');
+		      audio.src = audioUrl;
+		      audio.autoplay = true;
+		    var a = document.cookie.split(';');
+            var token = ''
+            for (i = 0; i < a.length; i++) {
+                var b = a[i].split('=')
+                b[0] = b[0].replace(/\s+/g, '')
+                if (b[0] == 'csrftoken') {
+                    token = b[1]
+                }
+            }
+            var formData = new FormData();
+            formData.append('audio', audioBlob);
+            formData.append('url', url);
+            formData.append('token', token);
+            $.ajax({
+            headers: { "X-CSRFToken": token },
+            url: '{% url 'main:voice_search' %}',
+            type: 'POST',
+            xhrFields:{
+                responseType: 'blob'
+            },
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (formData) {
+                console.log("Ajax прошел");
+            },
+            error: function () {
+              console.log("ERROR")
+            }
+        });
+        };
+        interval = setInterval(function(){mediaRecorder.requestData();},100);
+    });
+    var element = document.getElementById("text");
+	element.innerHTML = "Голосовой поиск...";
+}
+function Stop(){
+    if( recording ){
+        recording = false;
+        clearInterval(interval);
+        mediaRecorder.stop();
+        var element = document.getElementById("text");
+		element.innerHTML = "";
+    }
+
+
+
+}
+</script>
+
+</body>
+</html>

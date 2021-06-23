@@ -1,5 +1,5 @@
 from django import forms
-from .models import AdvUser, SubRubric, SuperRubric, Bb, AdditionalImage, Comment
+from .models import AdvUser, SubRubric, SuperRubric, Bb, AdditionalImage, Comment, Rating
 from django.contrib.auth import password_validation
 from django.core.exceptions import ValidationError
 from .apps import user_registered
@@ -49,14 +49,11 @@ class RegisterUserForm(forms.ModelForm):
         model = AdvUser
         fields = ('username', 'email', 'password1', 'password2', 'first_name', 'last_name', 'send_messages')
 
-
-
 class ChangeUserInfoForm(forms.ModelForm):
     email = forms.EmailField(required=True, label='Адрес электронной почты')
     class Meta:
         model = AdvUser
         fields = ('username', 'email', 'first_name', 'last_name', 'send_messages')
-
 
 class SubRubricForm(forms.ModelForm):
     super_rubric = forms.ModelChoiceField(queryset=SuperRubric.objects.all(), empty_label=None, label='Надрубрика', required=True)
@@ -70,11 +67,15 @@ class SearchForm(forms.Form):
 
 
 class UserCommentForm(forms.ModelForm):
+
     class Meta:
         model = Comment
         exclude = ('is_active',)
+
         widgets = {
-            'bb': forms.HiddenInput
+            'bb': forms.HiddenInput,
+            'author': forms.TextInput(attrs={'type': 'hidden'},)
+
         }
 
 class GuestCommentForm(forms.ModelForm):
@@ -85,3 +86,23 @@ class GuestCommentForm(forms.ModelForm):
         widgets = {
             'bb': forms.HiddenInput
         }
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        exclude = ('is_active',)
+        widgets = {
+            'author': forms.HiddenInput,
+            'user': forms.HiddenInput,
+            'star': forms.HiddenInput,
+            'bb': forms.HiddenInput
+        }
+
+class RatingForm(forms.ModelForm):
+    class Meta:
+        model = Rating
+        fields = ("star",)
+        widgets = {
+            "star": forms.RadioSelect(attrs={"class": "rating"})
+        }
+

@@ -1,6 +1,6 @@
 from django.contrib import admin
 import datetime
-from.models import AdvUser, SubRubric, SuperRubric, Bb, AdditionalImage, Comment
+from .models import AdvUser, SubRubric, SuperRubric, Bb, AdditionalImage, Comment, Stars, Rating
 from .utilities import send_activation_notification
 from .forms import SubRubricForm
 
@@ -57,15 +57,27 @@ admin.site.register(SubRubric, SubRubricAdmin)
 class AdditionalImageInline(admin.TabularInline):
     model = AdditionalImage
 
+
+
 class BbAdmin(admin.ModelAdmin):
     list_display = ('rubric', 'title', 'content', 'author', 'created_at')
-    fields = (('rubric', 'author'), 'title', 'content', 'price', 'contacts', 'city', 'street', 'image', 'is_active')
+    fields = (('rubric', 'author'), 'title', 'content', 'price', 'contacts', ('delivery1', 'comment1'), ('delivery2', 'comment2'), ('delivery3', 'comment3'),('money', 'сashless', 'invoce', 'visa', 'mastercard'), 'city', 'street', 'image', 'is_active')
     inlines = (AdditionalImageInline,)
 
 admin.site.register(Bb, BbAdmin)
 
 
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ('bb', 'author', 'content')
-    fields = ('bb', 'author', 'content')
+    list_display = ('bb', 'author', 'content', 'star', 'user')
+    fields = ('bb', 'author', 'content', 'star', 'user')
 admin.site.register(Comment, CommentAdmin)
+
+
+class StarsAdmin(admin.ModelAdmin):
+    list_display = ('star',)
+admin.site.register(Stars, StarsAdmin)
+
+class RatingAdmin(admin.ModelAdmin):
+    list_display = ('login', 'star', 'user')
+    fields = ('login', 'star', 'user')
+admin.site.register(Rating, RatingAdmin)

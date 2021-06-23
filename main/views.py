@@ -1,26 +1,39 @@
+import json
+
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.db.models.signals import post_save
 from django.core.signing import BadSignature
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.shortcuts import render
-from django.http import HttpResponse, Http404
+from django.shortcuts import render, redirect
+from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
 from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404, redirect
-from .models import AdvUser, SubRubric, Bb, Comment
-from .forms import ChangeUserInfoForm, RegisterUserForm, SearchForm, BbForm, AIFormSet, UserCommentForm, GuestCommentForm
+
+from . import forms
+from .models import AdvUser, SubRubric, Bb, Comment, Stars
+from .forms import ChangeUserInfoForm, RegisterUserForm, SearchForm, BbForm, CommentForm, AIFormSet, UserCommentForm, GuestCommentForm
 from django.views.generic.base import TemplateView
 from .utilities import signer, send_new_comment_notification
+from django.db.models import Avg
+import wave
+import ffmpeg
+import soundfile as sf
 
+
+#-*- coding:UTF-8 -*-
+import speech_recognition as sr
+import os
+import sys
+import webbrowser
 
 class BBPasswordChangeView(SuccessMessageMixin, LoginRequiredMixin, PasswordChangeView):
     template_name = 'main/password_change.html'
@@ -43,17 +56,75 @@ class ChangeUserInfoView(SuccessMessageMixin, LoginRequiredMixin, UpdateView):
             queryset = self.get_queryset()
         return get_object_or_404(queryset, pk=self.user_id)
 
-
 @login_required
 def profile(request):
+    bbs_count = Bb.objects.filter(author=request.user.pk)
     bbs = Bb.objects.filter(author=request.user.pk)
-    context = {'bbs': bbs}
+    context = {'bbs': bbs, 'bbs_count': bbs_count}
     return render(request, 'main/profile.html', context)
+
 
 def index(request):
     bbs = Bb.objects.filter(is_active=True)[:100]
-    context = {'bbs': bbs}
+    bbs_count = Bb.objects.filter(author=request.user.pk)
+    context = {'bbs': bbs, 'bbs_count': bbs_count}
     return render(request, 'main/index.html', context)
+
+def voice_search(request):
+    print(request)
+    token = request.POST.get('token')
+    print(token)
+    search = blob_search_decoder(request.FILES['audio'], token)
+
+    text = str(search)
+
+    # filter = Bb.objects.filter(Q(title__icontains=text) | Q(content__icontains=text))
+    print(text)
+    context = {'search_list': text}
+    return render(request, 'main/voice_search.html', context)
+
+
+# def voice_search(request):
+#     if request.is_ajax():
+#         if request.method == 'POST':
+#             print(request)
+#             url = 'http://127.0.0.1:8000/accounts/register/'
+#             return HttpResponseRedirect(url)
+#         else:
+#             return HttpResponse("GET")
+
+
+
+
+
+def blob_search_decoder(f, token):
+    filename = 'media/voice_search/' + token + '.ogg'
+    audio = 'media/voice_search/' + token + '.wav'
+    with open(filename, 'wb+') as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)
+    decoder(filename, audio)
+    text = audio_voice(audio)
+    os.remove(filename)
+    os.remove(audio)
+
+    return text
+
+
+
+def decoder(filename, audio):
+    cmd = "ffmpeg -i "+ str(filename)+" -acodec pcm_s16le -ac 1 -ar 16000 "+ str(audio)
+    os.system(cmd)
+
+def audio_voice(filename):
+    r = sr.Recognizer()
+    with sr.AudioFile(str(filename)) as source:
+        audio = r.listen(source)
+        text = r.recognize_google(audio, language="ru_RU")
+
+        # url = str('http://127.0.0.1:8000/search/?q=' + text).replace(' ', '+')
+        # os.system("open \"\"" + url)
+        return text
 
 
 def other_page(request, page):
@@ -130,8 +201,9 @@ def by_rubric(request, pk):
     else:
         page_num = 1
     page = paginator.get_page(page_num)
+    bbs_count = Bb.objects.filter(author=request.user.pk)
     context = {'rubric': rubric, 'page': page, 'bbs': page.object_list,
-               'form': form}
+               'form': form, 'bbs_count': bbs_count}
     return render(request, 'main/by_rubric.html', context)
 
 
@@ -154,17 +226,28 @@ def detail(request, rubric_pk, pk):
         else:
             form = c_form
             messages.add_message(request, messages.SUCCESS, 'Комментарий не добавлен')
+    bbs_count = Bb.objects.filter(author=request.user.pk)
+
+    star_form = Comment.objects.filter(user=bb.author.username).aggregate(Avg('star'))['star__avg']
+    stars = Stars.objects.all().order_by('-id')
+
+
+
+
+
     context = {
-        'bb': bb, 'ais': ais, 'comments': comments, 'form': form
+        'bb': bb, 'ais': ais, 'comments': comments, 'form': form, 'bbs_count': bbs_count, 'star_form': star_form, 'stars': stars
     }
     return render(request, 'main/detail.html', context)
+
 
 @login_required
 def profile_bb_detail(request, pk):
     bb = get_object_or_404(Bb, pk=pk)
     ais = bb.additionalimage_set.all()
     comments = Comment.objects.filter(bb=pk, is_active=True)
-    context = {'bb': bb, 'ais': ais, 'comments': comments}
+    bbs_count = Bb.objects.filter(author=request.user.pk)
+    context = {'bb': bb, 'ais': ais, 'comments': comments, 'bbs_count': bbs_count}
     return render(request, 'main/profile_bb_detail.html', context)
 
 @login_required
@@ -181,12 +264,14 @@ def profile_bb_add(request):
     else:
         form = BbForm(initial={'author': request.user.pk})
         formset = AIFormSet
-    context = {'form': form, 'formset': formset}
+    bbs_count = Bb.objects.filter(author=request.user.pk)
+    context = {'form': form, 'formset': formset, 'bbs_count': bbs_count}
     return render(request, 'main/profile_bb_add.html', context)
 
 @login_required
 def profile_bb_change(request, pk):
     bb = get_object_or_404(Bb, pk=pk)
+    print(bb)
     if request.method == 'POST':
         form = BbForm(request.POST, request.FILES, instance=bb)
         if form.is_valid():
@@ -200,7 +285,8 @@ def profile_bb_change(request, pk):
     else:
         form = BbForm(instance=bb)
         formset = AIFormSet(instance=bb)
-    context = {'form': form, 'formset': formset}
+    bbs_count = Bb.objects.filter(author=request.user.pk)
+    context = {'form': form, 'formset': formset, 'bbs_count': bbs_count}
     return render(request, 'main/profile_bb_change.html', context)
 
 @login_required
@@ -211,7 +297,8 @@ def profile_bb_delete(request, pk):
         messages.add_message(request, messages.SUCCESS, 'Объявление удалено')
         return redirect('main:profile')
     else:
-        context = {'bb': bb}
+        bbs_count = Bb.objects.filter(author=request.user.pk)
+        context = {'bb': bb, 'bbs_count':bbs_count}
         return render(request, 'main/profile_bb_delete.html', context)
 
 def post_save_dispatcher(sender, **kwargs):
@@ -221,21 +308,50 @@ def post_save_dispatcher(sender, **kwargs):
 post_save.connect(post_save_dispatcher, sender=Comment)
 
 
-# class Search(ListView):
-    # paginate_by = 3
-    # def get_queryset(request):
-    #
-    #     return Bb.objects.filter(title__icontains=self.request.GET.get("q"))
-    #
-    # def get_context_data(self, *args, **kwargs):
-    #     context = super().get_context_data(*args, **kwargs)
-    #     context["q"] = f'q={self.request.GET.get("q")}&'
-    #     return context
-
-
 def filter(request):
     search = request.GET['q']
     bb = Bb.objects.filter(Q(title__icontains=search) | Q(content__icontains=search))
+    bbs_count = Bb.objects.filter(author=request.user.pk)
+
     return render(request, 'main/search.html', context={
-                'bbs': bb,
-                })
+                    'bbs': bb,
+                    'bbs_count': bbs_count
+                    })
+
+
+def profile_seller(request,pk):
+    bbs_count = Bb.objects.filter(author=request.user.pk)
+    bb_profile_seller = Bb.objects.filter(author=pk)
+    return render(request, 'main/profile_seller.html', context={
+        'bb_profile_seller': bb_profile_seller,
+        'bbs_count': bbs_count
+    })
+
+
+@login_required
+def comment_bb_change(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+    if request.method == 'POST':
+        form = CommentForm(request.POST, instance=comment)
+        if form.is_valid():
+            comment = form.save()
+            messages.add_message(request, messages.SUCCESS, 'Комментарий исправлен')
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+    else:
+        form = CommentForm(instance=comment)
+    comment_change = Comment.objects.filter(author=request.user.username)
+    context = {'form': form, 'comment_change': comment_change}
+    return render(request, 'main/comment_bb_change.html', context)
+
+@login_required
+def comment_bb_delete(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+    if request.method == 'POST':
+        comment.delete()
+        messages.add_message(request, messages.SUCCESS, 'Комментарий удален')
+        return redirect('main:index')
+    else:
+        context = {'comment': comment}
+        return render(request, 'main/comment_bb_delete.html', context)
+
+
